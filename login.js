@@ -28,7 +28,7 @@ async function sendTelegram(message) {
   const hkTime = new Date(now.getTime() + (8 * 60 * 60 * 1000));
   const timeStr = hkTime.toISOString().replace('T', ' ').substr(0, 19) + " HKT";
 
-  const fullMessage = `🎉 Netlib 登录通知\n\n登录时间：${timeStr}\n\n${message}`;
+  const fullMessage = `🎉 Luneshost 登录通知\n\n登录时间：${timeStr}\n\n${message}`;
 
   try {
     await axios.post(`https://api.telegram.org/bot${token}/sendMessage`, {
@@ -58,14 +58,15 @@ async function loginWithAccount(email, pass) {
     
     console.log(`📱 ${email} - 正在访问网站...`);
     await page.goto('https://betadash.lunes.host/', { waitUntil: 'networkidle' });
-    
+    await page.waitForTimeout(3000);
+
     console.log(`📝 ${email} - 填写邮箱...`);
-    await page.waitForSelector('input[name="Email"], input[type="text"]', { timeout: 15000 });
     await page.fill('input[name="Email"], input[type="text"]', email);
+    await page.waitForTimeout(1000);
     
     console.log(`🔒 ${email} - 填写密码...`);
-    await page.waitForSelector('input[name="Password"], input[type="password"]', { timeout: 15000 });
     await page.fill('input[name="Password"], input[type="password"]', pass);
+    await page.waitForTimeout(1000);
 
     // 检查 Cloudflare 验证
     console.log(`🛡️ ${email} - 检查 Cloudflare 验证...`);
