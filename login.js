@@ -1,5 +1,11 @@
 const axios = require('axios');
-const { chromium } = require('playwright');
+// 使用 playwright-extra 增强反机器人检测
+const { chromium } = require('playwright-extra');
+// 导入 stealth 插件
+const stealth = require('playwright-extra-plugin-stealth')();
+
+// 将 stealth 插件添加到 chromium
+chromium.use(stealth);
 
 const token = process.env.BOT_TOKEN;
 const chatId = process.env.CHAT_ID;
@@ -53,10 +59,8 @@ async function loginWithAccount(email, pass) {
   let result = { email, success: false, message: '' };
   
   try {
-    const context = await browser.newContext({
-      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-      viewport: { width: 1280, height: 800 }
-    });
+    // 使用默认上下文，stealth插件会自动处理User-Agent和其他指纹
+    const context = await browser.newContext();
     page = await context.newPage();
     page.setDefaultTimeout(60000); // 全局超时增加到60秒
 
