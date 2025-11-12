@@ -57,7 +57,7 @@ async function loginWithAccount(email, pass) {
     page.setDefaultTimeout(30000);
     
     console.log(`📱 ${email} - 正在访问网站...`);
-    await page.goto('https://betadash.lunes.host/login?next=/', { waitUntil: 'networkidle' });
+    await page.goto('https://betadash.lunes.host/login', { waitUntil: 'networkidle' });
     await page.waitForTimeout(3000);
 
     console.log(`📝 ${email} - 填写邮箱...`);
