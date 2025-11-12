@@ -53,12 +53,31 @@ async function loginWithAccount(email, pass) {
   let result = { email, success: false, message: '' };
   
   try {
-    page = await browser.newPage();
-    page.setDefaultTimeout(60000);
-    
+    const context = await browser.newContext({
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+      viewport: { width: 1280, height: 800 }
+    });
+    page = await context.newPage();
+    page.setDefaultTimeout(60000); // 全局超时增加到60秒
+
     console.log(`📱 ${email} - 正在访问网站...`);
-    await page.goto('https://betadash.lunes.host/login', { waitUntil: 'networkidle' });
-    await page.waitForTimeout(3000);
+    let retries = 2;
+    while (retries > 0) {
+      try {
+        await page.goto('https://betadash.lunes.host/login', { waitUntil: 'domcontentloaded' });
+        console.log(`📝 ${email} - 页面加载完成，等待登录表单...`);
+        await page.waitForSelector('input[name="Email"]', { timeout: 15000 });
+        console.log(`✅ ${email} - 登录表单已出现。`);
+        break; // 成功则跳出循环
+      } catch (error) {
+        console.log(`⚠️ ${email} - 访问或查找登录表单失败，剩余重试次数: ${retries - 1}`);
+        retries--;
+        if (retries === 0) {
+          throw new Error('多次尝试访问登录页面失败。');
+        }
+        await page.waitForTimeout(5000); // 等待5秒后重试
+      }
+    }
 
     console.log(`📝 ${email} - 填写邮箱...`);
     await page.fill('input[name="Email"], input[type="text"]', email);
